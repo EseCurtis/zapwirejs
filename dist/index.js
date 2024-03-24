@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = __importDefault(require("./client"));
-const hooks_1 = __importDefault(require("./hooks"));
+const react_hooks_1 = __importDefault(require("./react-hooks"));
 exports.default = {
     Zapwire: client_1.default,
-    useZap: hooks_1.default
+    useZap: react_hooks_1.default
 };

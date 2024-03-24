@@ -1,5 +1,5 @@
 import Zapwire from "./client";
-import useZapwire from "./hooks";
+import useZapwire from "./react-hooks";
 
 export default {
     Zapwire: Zapwire,

@@ -15,7 +15,7 @@ npm install zapwirejs
 
 ```javascript
 import { useEffect, useState } from "react";
-import { useZap } from "zapwirejs";
+import useZap from "zapwirejs/react-hooks";
 
 function MyComponent() {
     const [broadcastData, broadcast, disconnect] = useZap("channelID", { /* optional config */ });

@@ -12,7 +12,7 @@ import Zapwire from "./client";
 
 type BroadcastData = Record<string, any>;
 
-function useZapwire(channelID?: string, config?: Zapwire["config"]) {
+function useZap(channelID?: string, config?: Zapwire["config"]) {
     /**
      * State variable to store the latest broadcast data received.
      */
@@ -99,4 +99,4 @@ function useZapwire(channelID?: string, config?: Zapwire["config"]) {
     return [broadcastData, broadcast, disconnect] as const;
 }
 
-export default useZapwire;
+export default useZap;
