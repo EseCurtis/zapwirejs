@@ -1,0 +1,35 @@
+{
+  "name": "zapwire",
+  "version": "1.0.5",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npx tsc && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EseCurtis/zapwire.git"
+  },
+  "keywords": [
+    "websockets",
+    "realtime",
+    "socket.io"
+  ],
+  "bugs": {
+    "url": "https://github.com/EseCurtis/zapwire/issues"
+  },
+  "homepage": "https://github.com/EseCurtis/zapwire#readme",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "@types/react": "^18.2.69",
+    "react": "^18.2.0",
+    "socket.io-client": "^4.7.2"
+  }
+}
