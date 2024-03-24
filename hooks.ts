@@ -1,13 +1,35 @@
 import { useEffect, useState } from "react";
 import Zapwire from "./client";
 
+/**
+ * A custom React hook for integrating Zapwire real-time messaging functionality into components.
+ * This hook allows components to listen for messages, broadcast messages, and disconnect from the Zapwire instance.
+ * @param channelID - Optional. The unique identifier for the communication channel.
+ * @param config - Optional. Configuration options for Zapwire.
+ * @returns An array containing the latest broadcast data, a function to broadcast messages, and a function to disconnect from the Zapwire instance.
+ */
+
+
 type BroadcastData = Record<string, any>;
 
 function useZapwire(channelID?: string, config?: Zapwire["config"]) {
+    /**
+     * State variable to store the latest broadcast data received.
+     */
     const [broadcastData, setBroadcastData] = useState<BroadcastData>({});
+
+    /**
+     * State variable to store the Zapwire instance.
+     */
     const [zapwire, setZapwire] = useState<Zapwire | null>(null);
 
+    /**
+     * Effect hook to initialize Zapwire and set up listeners.
+     */
     useEffect(() => {
+        /**
+         * Function to initialize Zapwire instance and set up listeners.
+         */
         const initZapwire = async () => {
             try {
                 const newZapwire = new Zapwire(channelID, config as Zapwire["config"]);
@@ -23,6 +45,9 @@ function useZapwire(channelID?: string, config?: Zapwire["config"]) {
 
         initZapwire();
 
+        /**
+         * Cleanup function to disconnect from Zapwire instance when component unmounts.
+         */
         return () => {
             if (zapwire) {
                 zapwire.cleanup();
@@ -30,8 +55,14 @@ function useZapwire(channelID?: string, config?: Zapwire["config"]) {
         };
     }, [channelID]);
 
+    /**
+     * Function to broadcast a message using the Zapwire instance.
+     * @param payload - The message payload to be broadcasted.
+     * @param scope - Optional. The scope of the broadcast. Defaults to "self".
+     * @returns A boolean indicating the success of the broadcast operation.
+     */
     const broadcast = async (payload: object, scope: string = "self") => {
-        if(typeof payload !== "object") {
+        if (typeof payload !== "object") {
             payload = {
                 data: payload,
                 type: typeof payload
@@ -51,6 +82,10 @@ function useZapwire(channelID?: string, config?: Zapwire["config"]) {
         }
     };
 
+    /**
+     * Function to disconnect from the Zapwire instance.
+     * @returns A boolean indicating the success of the disconnection operation.
+     */
     const disconnect = () => {
         if (!zapwire) {
             console.error("Zapwire not initialized.");

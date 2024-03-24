@@ -10,13 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_client_1 = require("socket.io-client");
-const this_qwickEndpoint = "https://qwick.onrender.com";
+/*!
+ * Zapwire v1.0.0
+ * (c) 2023-2023 Ese Curtis
+ * Released under the MIT License.
+ */
 class Zapwire {
+    /**
+    * Constructs a new instance of the Zapwire class.
+    * @param channelID - Unique identifier for the communication channel.
+    * @param config - Configuration options for Zapwire.
+    * @param disconnectWatcher - Indicates whether to watch for disconnections.
+    */
     constructor(channelID = "", config, disconnectWatcher = false) {
         this.reconnectAttempts = 0;
+        this.wss = "https://qwick.onrender.com";
         this.config = config;
         this.configInfo = (config === null || config === void 0 ? void 0 : config.info) ? config.info : {};
-        this.socket = (0, socket_io_client_1.io)(this_qwickEndpoint);
+        this.socket = (0, socket_io_client_1.io)(this.wss);
         this.channelID = null;
         if (!socket_io_client_1.io) {
             this.showLog("Socket.io Client Library not detected. And Zapwire Initilization failed as it is a primary dpendency", console.error);
@@ -29,9 +40,14 @@ class Zapwire {
             this.disconnectChannel = new Zapwire(`${channelID}:disconnected`, config, true);
         }
     }
+    /**
+     * Checks if a channel exists.
+     * @param channelID - The ID of the channel to check.
+     * @returns A promise that resolves to true if the channel exists; otherwise, false.
+     */
     static channelExist(channelID) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(this_qwickEndpoint + "/ping/check-existence", {
+            const response = yield fetch(Zapwire.wss + "/ping/check-existence", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -44,6 +60,11 @@ class Zapwire {
             return result.existence;
         });
     }
+    /**
+        * Logs a message to the console.
+        * @param log - The message to log.
+        * @param logger - The logger function to use.
+        */
     showLog(log, logger = console.log) {
         var _a;
         if ((_a = this.config) === null || _a === void 0 ? void 0 : _a.allowLogging) {
@@ -58,6 +79,10 @@ class Zapwire {
             logger(`${timestamp} - ${methodName}: ${log}`);
         }
     }
+    /**
+     * Configures the instance with the specified channel ID.
+     * @param channelID - The channel ID to configure with.
+     */
     configure(channelID) {
         this.showLog('Configuring with channel ID: ' + channelID);
         this.channelIDPromise = new Promise((resolve, reject) => {
@@ -74,26 +99,46 @@ class Zapwire {
             this.socket.emit("config", channelID && { channelID: channelID, info: this.configInfo });
         });
     }
+    /**
+         * Handles disconnection events.
+         */
     handleDisconnect() {
         this.socket.on("disconnect", () => {
             this.showLog('Socket disconnected. Attempting to reconnect...', console.warn);
             this.reconnect({}, "self");
         });
     }
+    /**
+     * Listens for incoming messages.
+     * @param callback - The callback function to invoke when a message is received.
+     */
     listen(callback = Function) {
         this.showLog('Listening for messages');
         this.socket.on("message", callback);
     }
+    /**
+    * Listens for disconnection events.
+    * @param callback - The callback function to invoke when a disconnection occurs.
+    */
     listenDisconnect(callback = Function) {
         this.showLog('Listening for disconnections');
         if (this.disconnectChannel) {
             this.disconnectChannel.listen(callback);
         }
     }
+    /**
+     * Cleans up resources and removes event listeners.
+     */
     cleanup() {
         this.socket.removeAllListeners();
         this.socket.disconnect();
     }
+    /**
+    * Broadcasts a message to the specified scope.
+    * @param payload - The payload to broadcast.
+    * @param scope - The scope of the broadcast.
+    * @returns A promise that resolves to true if the broadcast is successful; otherwise, false.
+    */
     broadcast() {
         return __awaiter(this, arguments, void 0, function* (payload = {}, scope = "self") {
             if (typeof payload !== "object")
@@ -112,6 +157,12 @@ class Zapwire {
             }
         });
     }
+    /**
+     * Sends a ping request to the server.
+     * @param payload - The payload of the ping request.
+     * @param pingType - The type of ping request.
+     * @returns A promise that resolves to true if the ping is successful; otherwise, false.
+     */
     ping(payload, pingType) {
         return __awaiter(this, void 0, void 0, function* () {
             this.showLog('Pinging server with payload: ' + JSON.stringify(payload));
@@ -144,6 +195,11 @@ class Zapwire {
             }
         });
     }
+    /**
+     * Determines the target of the ping request.
+     * @param pingType - The type of ping request.
+     * @returns The target of the ping request.
+     */
     determinePingTo(pingType) {
         let pingTo = this.key;
         if (pingType !== 'self' && pingType !== 'public') {
@@ -151,6 +207,11 @@ class Zapwire {
         }
         return pingTo;
     }
+    /**
+     * Determines the route for the ping request.
+     * @param pingType - The type of ping request.
+     * @returns The route for the ping request.
+     */
     determinePingRoute(pingType) {
         let pingRoute = "/self";
         if (pingType === 'public') {
@@ -158,8 +219,15 @@ class Zapwire {
         }
         return pingRoute;
     }
+    /**
+     * Sends the ping request to the server.
+     * @param pingRoute - The route for the ping request.
+     * @param payload - The payload of the ping request.
+     * @param pingTo - The target of the ping request.
+     * @returns A promise that resolves to the server response.
+     */
     sendPingRequest(pingRoute, payload, pingTo) {
-        return fetch(this_qwickEndpoint + "/ping" + pingRoute, {
+        return fetch(this.wss + "/ping" + pingRoute, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -171,11 +239,21 @@ class Zapwire {
             }),
         });
     }
+    /**
+     * Handles unauthorized errors during ping requests.
+     * @param payload - The payload of the ping request.
+     * @param pingType - The type of ping request.
+     */
     handleUnauthorizedError(payload, pingType) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.reconnect(payload, pingType);
         });
     }
+    /**
+     * Handles successful ping responses from the server.
+     * @param response - The response from the server.
+     * @returns A promise that resolves to the server response.
+     */
     handleSuccessfulPingResponse(response) {
         return __awaiter(this, void 0, void 0, function* () {
             if (response.ok) {
@@ -190,9 +268,18 @@ class Zapwire {
             }
         });
     }
+    /**
+     * Handles errors that occur during ping requests.
+     * @param error - The error that occurred during the ping request.
+     */
     handlePingError(error) {
         this.showLog('Error in ping: ' + error.message, console.error);
     }
+    /**
+    * Attempts to reconnect to the server.
+    * @param payload - The payload of the ping request.
+    * @param pingType - The type of ping request.
+    */
     reconnect(payload, pingType) {
         return __awaiter(this, void 0, void 0, function* () {
             this.reconnectAttempts++;
@@ -216,4 +303,5 @@ class Zapwire {
         });
     }
 }
+Zapwire.wss = "https://qwick.onrender.com";
 exports.default = Zapwire;

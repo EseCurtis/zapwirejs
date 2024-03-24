@@ -15,9 +15,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = require("react");
 const client_1 = __importDefault(require("./client"));
 function useZapwire(channelID, config) {
+    /**
+     * State variable to store the latest broadcast data received.
+     */
     const [broadcastData, setBroadcastData] = (0, react_1.useState)({});
+    /**
+     * State variable to store the Zapwire instance.
+     */
     const [zapwire, setZapwire] = (0, react_1.useState)(null);
+    /**
+     * Effect hook to initialize Zapwire and set up listeners.
+     */
     (0, react_1.useEffect)(() => {
+        /**
+         * Function to initialize Zapwire instance and set up listeners.
+         */
         const initZapwire = () => __awaiter(this, void 0, void 0, function* () {
             try {
                 const newZapwire = new client_1.default(channelID, config);
@@ -31,12 +43,21 @@ function useZapwire(channelID, config) {
             }
         });
         initZapwire();
+        /**
+         * Cleanup function to disconnect from Zapwire instance when component unmounts.
+         */
         return () => {
             if (zapwire) {
                 zapwire.cleanup();
             }
         };
     }, [channelID]);
+    /**
+     * Function to broadcast a message using the Zapwire instance.
+     * @param payload - The message payload to be broadcasted.
+     * @param scope - Optional. The scope of the broadcast. Defaults to "self".
+     * @returns A boolean indicating the success of the broadcast operation.
+     */
     const broadcast = (payload_1, ...args_1) => __awaiter(this, [payload_1, ...args_1], void 0, function* (payload, scope = "self") {
         if (typeof payload !== "object") {
             payload = {
@@ -56,6 +77,10 @@ function useZapwire(channelID, config) {
             return false;
         }
     });
+    /**
+     * Function to disconnect from the Zapwire instance.
+     * @returns A boolean indicating the success of the disconnection operation.
+     */
     const disconnect = () => {
         if (!zapwire) {
             console.error("Zapwire not initialized.");
