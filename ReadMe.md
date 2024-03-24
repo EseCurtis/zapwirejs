@@ -8,17 +8,17 @@ The Zapwire React Hook provides an easy way to integrate real-time messaging fun
 You can install the Zapwire React Hook via npm:
 
 ```bash
-npm install zapwire-react-hook
+npm install zapwirejs
 ```
 
 ## Usage
 
 ```javascript
 import { useEffect, useState } from "react";
-import useZapwire from "zapwire-react-hook";
+import { useZap } from "zapwirejs";
 
 function MyComponent() {
-    const [broadcastData, broadcast, disconnect] = useZapwire("channelID", { /* optional config */ });
+    const [broadcastData, broadcast, disconnect] = useZap("channelID", { /* optional config */ });
 
     useEffect(() => {
         // Component initialization code
@@ -49,7 +49,7 @@ function MyComponent() {
 
 ## API
 
-### `useZapwire(channelID?, config?)`
+### `useZap(channelID?, config?)`
 
 This hook initializes a Zapwire instance and sets up listeners for incoming messages.
 
@@ -64,5 +64,4 @@ Returns an array containing:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-```
 
