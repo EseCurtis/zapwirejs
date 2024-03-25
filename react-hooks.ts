@@ -12,7 +12,7 @@ import Zapwire from "./client";
 
 type BroadcastData = Record<string, any>;
 
-function useZap(channelID?: string, config?: Zapwire["config"]) {
+function useZap<T>(channelID?: string, config?: Zapwire["config"]): [T, (payload: T)=>void, Zapwire["cleanup"]] {
     /**
      * State variable to store the latest broadcast data received.
      */
@@ -36,7 +36,7 @@ function useZap(channelID?: string, config?: Zapwire["config"]) {
                 setZapwire(newZapwire);
 
                 newZapwire.listen((message: any) => {
-                    setBroadcastData(message);
+                    setBroadcastData(message?.data);
                 });
             } catch (error) {
                 console.error("Error initializing Zapwire:", error);
@@ -62,12 +62,10 @@ function useZap(channelID?: string, config?: Zapwire["config"]) {
      * @returns A boolean indicating the success of the broadcast operation.
      */
     const broadcast = async (payload: object, scope: string = "self") => {
-        if (typeof payload !== "object") {
-            payload = {
+        payload = {
                 data: payload,
                 type: typeof payload
             }
-        }
 
         if (!zapwire) {
             return false;
