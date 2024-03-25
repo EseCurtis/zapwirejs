@@ -7,8 +7,9 @@ import { io, Socket } from "socket.io-client";
  */
 
 
+const wss = "https://qwick.onrender.com";
+
 class Zapwire {
-    private wss: string;
     private socket: Socket;
     private channelID: string | null;
     private key: string | undefined;
@@ -17,7 +18,6 @@ class Zapwire {
     private channelIDPromise?: Promise<string>;
     private disconnectChannel?: Zapwire;
     private reconnectAttempts: number = 0;
-    static wss: string = "https://qwick.onrender.com";
 
     /**
     * Constructs a new instance of the Zapwire class.
@@ -26,11 +26,11 @@ class Zapwire {
     * @param disconnectWatcher - Indicates whether to watch for disconnections.
     */
     constructor(channelID: string = "", config: Zapwire["config"], disconnectWatcher: boolean = false) {
-        this.wss = "https://qwick.onrender.com";
+ 
         this.config = config;
         this.configInfo = config?.info ? config.info : {};
 
-        this.socket = io(this.wss);
+        this.socket = io(wss);
         this.channelID = null;
         if (!io) {
             this.showLog("Socket.io Client Library not detected. And Zapwire Initilization failed as it is a primary dpendency", console.error);
@@ -51,7 +51,7 @@ class Zapwire {
      * @returns A promise that resolves to true if the channel exists; otherwise, false.
      */
     static async channelExist(channelID: string): Promise<boolean> {
-        const response = await fetch(Zapwire.wss + "/ping/check-existence", {
+        const response = await fetch(wss + "/ping/check-existence", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -238,7 +238,7 @@ class Zapwire {
      * @returns A promise that resolves to the server response.
      */
     private sendPingRequest(pingRoute: string, payload: object, pingTo: string): Promise<Response> {
-        return fetch(this.wss + "/ping" + pingRoute, {
+        return fetch(wss + "/ping" + pingRoute, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

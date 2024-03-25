@@ -15,6 +15,7 @@ const socket_io_client_1 = require("socket.io-client");
  * (c) 2023-2023 Ese Curtis
  * Released under the MIT License.
  */
+const wss = "https://qwick.onrender.com";
 class Zapwire {
     /**
     * Constructs a new instance of the Zapwire class.
@@ -24,10 +25,9 @@ class Zapwire {
     */
     constructor(channelID = "", config, disconnectWatcher = false) {
         this.reconnectAttempts = 0;
-        this.wss = "https://qwick.onrender.com";
         this.config = config;
         this.configInfo = (config === null || config === void 0 ? void 0 : config.info) ? config.info : {};
-        this.socket = (0, socket_io_client_1.io)(this.wss);
+        this.socket = (0, socket_io_client_1.io)(wss);
         this.channelID = null;
         if (!socket_io_client_1.io) {
             this.showLog("Socket.io Client Library not detected. And Zapwire Initilization failed as it is a primary dpendency", console.error);
@@ -47,7 +47,7 @@ class Zapwire {
      */
     static channelExist(channelID) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(Zapwire.wss + "/ping/check-existence", {
+            const response = yield fetch(wss + "/ping/check-existence", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -227,7 +227,7 @@ class Zapwire {
      * @returns A promise that resolves to the server response.
      */
     sendPingRequest(pingRoute, payload, pingTo) {
-        return fetch(this.wss + "/ping" + pingRoute, {
+        return fetch(wss + "/ping" + pingRoute, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -303,5 +303,4 @@ class Zapwire {
         });
     }
 }
-Zapwire.wss = "https://qwick.onrender.com";
 exports.default = Zapwire;
