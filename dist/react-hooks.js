@@ -35,7 +35,7 @@ function useZap(channelID, config) {
                 const newZapwire = new client_1.default(channelID, config);
                 setZapwire(newZapwire);
                 newZapwire.listen((message) => {
-                    setBroadcastData(message);
+                    setBroadcastData(message === null || message === void 0 ? void 0 : message.data);
                 });
             }
             catch (error) {
@@ -55,21 +55,19 @@ function useZap(channelID, config) {
     /**
      * Function to broadcast a message using the Zapwire instance.
      * @param payload - The message payload to be broadcasted.
-     * @param scope - Optional. The scope of the broadcast. Defaults to "self".
+     * @param scope - Optional. The scope of the broadcast. Defaults to "self" but has "public" scope also.
      * @returns A boolean indicating the success of the broadcast operation.
      */
     const broadcast = (payload_1, ...args_1) => __awaiter(this, [payload_1, ...args_1], void 0, function* (payload, scope = "self") {
-        if (typeof payload !== "object") {
-            payload = {
-                data: payload,
-                type: typeof payload
-            };
-        }
+        const broadCastPayload = {
+            data: payload,
+            type: typeof payload
+        };
         if (!zapwire) {
             return false;
         }
         try {
-            const success = yield zapwire.broadcast(payload, scope);
+            const success = yield zapwire.broadcast(broadCastPayload, scope);
             return success;
         }
         catch (error) {

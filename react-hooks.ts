@@ -10,13 +10,15 @@ import Zapwire from "./client";
  */
 
 
-type BroadcastData = Record<string, any>;
+type TuseZapScope = "self"|"public";
+type TuseZapBroadcast<T> = (payload: T, scope: TuseZapScope ) => Promise<boolean>
+type TuseZap<T> = [T, TuseZapBroadcast<T>, Zapwire["cleanup"]];
 
-function useZap<T>(channelID?: string, config?: Zapwire["config"]): [T, (payload: T)=>void, Zapwire["cleanup"]] {
+function useZap<T>(channelID?: string, config?: Zapwire["config"]): TuseZap<T> {
     /**
      * State variable to store the latest broadcast data received.
      */
-    const [broadcastData, setBroadcastData] = useState<BroadcastData>({});
+    const [broadcastData, setBroadcastData] = useState<T | {}>({});
 
     /**
      * State variable to store the Zapwire instance.
@@ -58,11 +60,11 @@ function useZap<T>(channelID?: string, config?: Zapwire["config"]): [T, (payload
     /**
      * Function to broadcast a message using the Zapwire instance.
      * @param payload - The message payload to be broadcasted.
-     * @param scope - Optional. The scope of the broadcast. Defaults to "self".
+     * @param scope - Optional. The scope of the broadcast. Defaults to "self" but has "public" scope also.
      * @returns A boolean indicating the success of the broadcast operation.
      */
-    const broadcast = async (payload: object, scope: string = "self") => {
-        payload = {
+    const broadcast = async (payload: T, scope: TuseZapScope = "self") => {
+        const broadCastPayload = {
                 data: payload,
                 type: typeof payload
             }
@@ -72,7 +74,7 @@ function useZap<T>(channelID?: string, config?: Zapwire["config"]): [T, (payload
         }
 
         try {
-            const success = await zapwire.broadcast(payload, scope);
+            const success = await zapwire.broadcast(broadCastPayload, scope);
             return success;
         } catch (error) {
             console.error("Error broadcasting message:", error);
@@ -94,7 +96,7 @@ function useZap<T>(channelID?: string, config?: Zapwire["config"]): [T, (payload
         return true;
     };
 
-    return [broadcastData, broadcast, disconnect] as const;
+    return [broadcastData as T, broadcast, disconnect] as const;
 }
 
 export default useZap;
